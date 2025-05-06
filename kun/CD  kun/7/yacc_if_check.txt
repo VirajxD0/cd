@@ -1,0 +1,123 @@
+A7_lexer.l
+
+%{
+#include "y.tab.h"
+#include <stdio.h>
+%}
+
+%%
+
+"if"        { return IF; }
+"else"      { return ELSE; }
+"("         { return LPAREN; }
+")"         { return RPAREN; }
+"{"         { return LBRACE; }
+"}"         { return RBRACE; }
+";"         { return SEMICOLON; }
+
+">"         { return GT; }
+"<"         { return LT; }
+"=="        { return EQ; }
+"!="        { return NE; }
+"="         { return ASSIGN; }
+"+"         { return PLUS; }
+"-"         { return MINUS; }
+
+[0-9]+      { return NUMBER; }
+[a-zA-Z][a-zA-Z0-9_]*  { return ID; }
+
+[ \t\n]     { /* skip whitespace */ }
+
+.           { printf("Unexpected character: %c\n", yytext[0]); }
+
+%%
+
+int yywrap() {
+    return 1;
+}
+
+
+
+A7_parser.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+void yyerror(const char *s);
+int yylex();
+int syntax_valid = 1;
+%}
+
+%token IF ELSE LPAREN RPAREN LBRACE RBRACE SEMICOLON
+%token ID NUMBER
+%token GT LT EQ NE ASSIGN PLUS MINUS
+
+%left GT LT EQ NE
+%left PLUS MINUS
+%right ASSIGN
+
+%%
+program: statement;
+
+statement:
+      if_stmt
+    | matched_stmt
+    ;
+
+if_stmt:
+      IF LPAREN condition RPAREN statement %prec IF
+    | IF LPAREN condition RPAREN statement ELSE statement
+    | IF error { yyerror("Syntax error in if statement"); syntax_valid = 0; }
+    ;
+
+matched_stmt:
+      block
+    | expression SEMICOLON
+    | SEMICOLON
+    ;
+
+block:
+      LBRACE statement_list RBRACE
+    | LBRACE RBRACE
+    ;
+
+statement_list:
+      statement
+    | statement_list statement
+    ;
+
+condition:
+      expression
+    ;
+
+expression:
+      ID
+    | NUMBER
+    | LPAREN expression RPAREN
+    | expression PLUS expression
+    | expression MINUS expression
+    | expression GT expression
+    | expression LT expression
+    | expression EQ expression
+    | expression NE expression
+    | ID ASSIGN expression
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    fprintf(stderr, "%s\n", s);
+}
+
+int main() {
+    printf("Enter an if or if-else statement:\n");
+    yyparse();
+    if (syntax_valid) {
+        printf("Syntax is correct.\n");
+    } else {
+        printf("Syntax contains errors.\n");
+    }
+    return 0;
+}
+

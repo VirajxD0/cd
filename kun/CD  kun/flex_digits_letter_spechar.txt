@@ -1,0 +1,33 @@
+Count digits, letters, and special characters
+
+%{
+#include <stdio.h>
+
+int digit_count = 0, letter_count = 0, special_count = 0;
+%}
+
+%%
+
+[0-9]      { digit_count++; }  // Count digits
+[a-zA-Z]   { letter_count++; } // Count letters
+[^a-zA-Z0-9 \t\n] { special_count++; } // Count special characters
+
+[\t ]+     { /* Ignore spaces and tabs */ }
+\n         { /* Ignore newlines */ }
+
+%%
+
+int main() {
+    printf("Enter input (Press Ctrl+D to end):\n");
+    yylex();
+
+    printf("\nTotal Digits: %d\n", digit_count);
+    printf("Total Letters: %d\n", letter_count);
+    printf("Total Special Characters: %d\n", special_count);
+
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

@@ -1,0 +1,85 @@
+
+
+1.Design Lexical Analyzer for SQL in C / C++ / Java. Submit a single .pdf with input , output and code
+
+
+2. Implement lexical analyzer using LEX
+tool for the
+following: recognize
+and count the total
+number of vowels
+convert lowercase to
+uppercase eg: abc to
+ABC Count the
+number of
+lines, words and
+characters in a
+snippet of
+code/paragraph
+
+
+3. Implement lexical analyzer for the subset of English
+language using LEX.
+Input filename as
+command line
+argument. Sample
+Input: The Boy is
+swimming Sample
+Output: Line 1:
+Lexeme: The Token:
+ARTICLE Line 1:
+Lexeme: Boy Token:
+NOUN Line 1:
+Lexeme: is Token:
+VERB Line 1:
+Lexeme: swimming
+Token: VERB
+
+
+
+
+4. Implement a lexical analyzer using LEX for the following: 
+(i)Detect integers,Floating points,characters and invalid charaacter as well as numbers 
+(ii)To count the number of digits,letters and special characters 
+(iii)Identify operands and operators in code 
+(iv)Check whether the given email address is valid or not 
+(v)Identify and validate the given data format 
+(vi)Identify and count the number of positive and negative integers 
+(vii)To check and count the frequency of the given word in the file  
+(viii)Identify and replace the words with digits and vice versa 
+(ix)Check whether the paratheses are balanced or not 
+(x)Count the number of sentences in the given input or file 
+(xi)The lexical analyzer should ignore redundant spaces, tabs, new lines, comments, etc. 
+(xii) to scan reserved words & Identifiers of C Language
+
+
+5.Implement a parser for an expression
+grammar using
+YACC and LEX.
+Extend to handle
+variables with single
+letter names
+
+
+6.Implement a parser for an expression
+grammar(eg:ab+xy)
+using YACC and LEX.
+Extend to handle
+variables with
+double letter names
+
+7.YACC specification to check the syntax
+of while statement
+of 'C' language with error detection. For
+both the while
+statement -
+do..while,while...do
+
+8. Implement Common Sub-expression Elimination optimization on input set of quadruples in C/C++/ Java
+
+
+
+
+Implement Constant folding and Constant Propagation optimization on input set of quadruples in C/C++/ Java
+
+

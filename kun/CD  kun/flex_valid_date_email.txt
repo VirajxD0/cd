@@ -1,0 +1,21 @@
+%{
+    #include <stdio.h>
+    #include <string.h>
+    #include <stdlib.h>
+%}
+
+%%
+^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$  {printf("Valid email\n");}
+^[0-9]{4}-[0-9]{2}-[0-9]{2}$    {printf("Valid date\n");}
+[^\n]+  {printf("Invalid input\n");}
+\n  {/*Ignore*/}
+%%
+
+int main() {
+    printf("Enter input: \n");
+    yylex();
+    return 0;
+}
+int yywrap() {
+    return 1;
+}

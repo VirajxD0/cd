@@ -1,0 +1,102 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_TOKENS 100
+#define MAX_TOKEN_LEN 50
+
+typedef enum {
+    KEYWORD, IDENTIFIER, OPERATOR, STRING_LITERAL,
+    NUMERIC_LITERAL, DELIMITER, UNKNOWN
+} TokenType;
+
+const char *TOKEN_NAMES[] = {
+    "KEYWORD", "IDENTIFIER", "OPERATOR", "STRING_LITERAL",
+    "NUMERIC_LITERAL", "DELIMITER", "UNKNOWN"
+};
+
+const char *KEYWORDS[] = {"SELECT", "INSERT", "INTO", "VALUES", "FROM", "WHERE"};
+
+typedef struct {
+    char value[MAX_TOKEN_LEN];
+    TokenType type;
+} Token;
+
+void tokenize(const char *code, Token tokens[], int *token_count) {
+    *token_count = 0;
+    int i = 0;
+
+    while (code[i] && *token_count < MAX_TOKENS) {
+        if (isspace(code[i])) { i++; continue; }
+
+        Token *t = &tokens[(*token_count)++];
+        int j = 0;
+
+        if (isalpha(code[i]) || code[i] == '_') {
+            while (isalnum(code[i]) || code[i] == '_')
+                t->value[j++] = code[i++];
+
+            t->value[j] = '\0';
+            // Check if it's a keyword (case-insensitive)
+            t->type = IDENTIFIER;
+            for (int k = 0; k < sizeof(KEYWORDS)/sizeof(KEYWORDS[0]); k++) {
+                if (strcasecmp(t->value, KEYWORDS[k]) == 0) {
+                    t->type = KEYWORD;
+                    break;
+                }
+            }
+        } else if (isdigit(code[i])) {
+            while (isdigit(code[i]))
+                t->value[j++] = code[i++];
+
+            t->value[j] = '\0';
+            t->type = NUMERIC_LITERAL;
+        } else if (code[i] == '"' || code[i] == '\'') {
+            char quote = code[i];
+            t->value[j++] = code[i++];
+
+            while (code[i] != quote && code[i])
+                t->value[j++] = code[i++];
+
+            if (code[i] == quote)
+                t->value[j++] = code[i++];
+
+            t->value[j] = '\0';
+            t->type = STRING_LITERAL;
+        } else if (strchr("=<>!", code[i])) { // Operators
+            while (strchr("=<>!", code[i]))
+                t->value[j++] = code[i++];
+
+            t->value[j] = '\0';
+            t->type = OPERATOR;
+        } else if (strchr("();,", code[i])) { // Delimiters
+            t->value[j++] = code[i++];
+            t->value[j] = '\0';
+            t->type = DELIMITER;
+        } else {
+            t->value[j++] = code[i++];
+            t->value[j] = '\0';
+            t->type = UNKNOWN;
+        }
+    }
+}
+
+int main() {
+    char sql_code[1000];
+    Token tokens[MAX_TOKENS];
+    int token_count;
+
+    printf("Enter SQL query:\n");
+    fgets(sql_code, sizeof(sql_code), stdin);
+
+    tokenize(sql_code, tokens, &token_count);
+
+    printf("\n%-15s %-15s\n", "Value", "Kind");
+    printf("---------------------------------\n");
+    for (int i = 0; i < token_count; i++) {
+        printf("%-15s %-15s\n", tokens[i].value, TOKEN_NAMES[tokens[i].type]);
+    }
+    printf("\nTotal Tokens: %d\n", token_count);
+
+    return 0;
+}

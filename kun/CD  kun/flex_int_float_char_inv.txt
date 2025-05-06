@@ -1,0 +1,36 @@
+Detect integers, floating points, characters, and invalid characters/numbers
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int line_no = 1;
+%}
+
+%%
+
+[0-9]+                              { printf("Line %d: Lexeme: %s Token: INTEGER\n", line_no, yytext); }
+
+[0-9]+\.[0-9]+                      { printf("Line %d: Lexeme: %s Token: FLOATING POINT\n", line_no, yytext); }
+
+'[a-zA-Z0-9]'                        { printf("Line %d: Lexeme: %s Token: CHARACTER\n", line_no, yytext); }
+
+[0-9]+[a-zA-Z]+                      { printf("Line %d: Lexeme: %s Token: INVALID NUMBER\n", line_no, yytext); }
+
+[^a-zA-Z0-9_.,?!;:"'()\[\] \t\n]     { printf("Line %d: Lexeme: %s Token: INVALID CHARACTER\n", line_no, yytext); }
+
+[\t ]+                               { /* Ignore spaces and tabs */ }
+
+\n                                   { line_no++; }
+%%
+
+int main() {
+    printf("Enter input (Press Ctrl+D to end):\n");
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

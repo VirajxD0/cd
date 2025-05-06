@@ -1,0 +1,62 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+#define COMM(o) (!strcmp(o,"+") || !strcmp(o,"*"))
+#define MATCH(a,b) (!strcmp(a,b))
+#define ELIM "ELIM"
+
+typedef struct { char op[5], a1[10], a2[10], res[10]; } Quad;
+
+int main() {
+    Quad q[MAX];
+    char e[MAX][10], r[MAX][10];
+    int n, i, j, ec = 0;
+    
+    printf("Enter number of quadruples: ");
+    scanf("%d", &n);
+    
+    printf("Enter quadruples (op arg1 arg2 result):\n");
+    for(i = 0; i < n; i++)
+        scanf("%s %s %s %s", q[i].op, q[i].a1, q[i].a2, q[i].res);
+    
+    // Find & eliminate common subexpressions
+    for(i = 0; i < n; i++)
+        for(j = 0; j < i; j++)
+            if(COMM(q[i].op) && MATCH(q[i].op, q[j].op) && 
+              ((MATCH(q[i].a1, q[j].a1) && MATCH(q[i].a2, q[j].a2)) || 
+               (MATCH(q[i].a1, q[j].a2) && MATCH(q[i].a2, q[j].a1)))) {
+                printf("Eliminating: %s %s %s → %s (use %s)\n", 
+                       q[i].op, q[i].a1, q[i].a2, q[i].res, q[j].res);
+                strcpy(e[ec], q[i].res);
+                strcpy(r[ec++], q[j].res);
+                strcpy(q[i].op, ELIM);
+                break;
+            }
+    
+    // Replace eliminated references
+    for(i = 0; i < n; i++) {
+        if(MATCH(q[i].op, ELIM)) continue;
+        for(j = 0; j < ec; j++) {
+            if(MATCH(q[i].a1, e[j])) strcpy(q[i].a1, r[j]);
+            if(MATCH(q[i].a2, e[j])) strcpy(q[i].a2, r[j]);
+        }
+    }
+    
+    // Print result
+    printf("\nOptimized Quadruples:\n");
+    printf("%-8s%-8s%-8s%-8s\n", "op", "arg1", "arg2", "result");
+    
+    for(i = 0; i < n; i++) {
+        if(!MATCH(q[i].op, ELIM)) {
+            printf("%-8s%-8s%-8s%-8s\n", q[i].op, q[i].a1, q[i].a2, q[i].res);
+        }
+    }
+    
+    return 0;
+}
+
+
+// + a b t1
+// + a b t2
+// * t1 c t3
+// * t2 c t4

@@ -1,0 +1,50 @@
+%{
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+int vowel_count = 0;
+int line_count = 1;
+int word_count = 0;
+int char_count = 0;
+int in_word = 0;  // Track if we're inside a word
+
+char output[10000];  // Buffer to store the processed output
+int output_index = 0;
+%}
+
+%%
+
+[aeiouAEIOU] { vowel_count++; char_count++; if (!in_word) { word_count++; in_word = 1; } output[output_index++] = toupper(yytext[0]); }
+
+[a-z]           { char_count++; if (!in_word) { word_count++; in_word = 1; } output[output_index++] = toupper(yytext[0]); }
+
+[A-Z]           { char_count++; if (!in_word) { word_count++; in_word = 1; } output[output_index++] = yytext[0]; }
+
+[ \t]+          { char_count += yyleng; in_word = 0; strncat(output, yytext, yyleng); output_index += yyleng; }
+
+\n              { line_count++; char_count++; in_word = 0; output[output_index++] = '\n'; }
+
+.               { char_count++; if (!in_word && yytext[0] != ' ' && yytext[0] != '\n' && yytext[0] != '\t') { word_count++; in_word = 1; } output[output_index++] = yytext[0]; }
+
+%%
+
+int main() {
+    printf("Enter your code (Press Ctrl+D to end input):\n");
+    yylex();
+
+    output[output_index] = '\0';  // Null-terminate the output buffer
+
+    printf("\n--- Processed Output ---\n%s", output);
+    printf("\n--- Statistics ---\n");
+    printf("Total Vowels: %d\n", vowel_count);
+    printf("Total Lines: %d\n", line_count);
+    printf("Total Words: %d\n", word_count);
+    printf("Total Characters: %d\n", char_count);
+
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

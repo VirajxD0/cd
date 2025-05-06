@@ -1,0 +1,66 @@
+%{
+#include <stdio.h>
+
+int sentence_count = 0;  // Counter for sentences
+%}
+
+%%
+"." { sentence_count++; }   // Increment count for '.'
+"!" { sentence_count++; }   // Increment count for '!'
+"?" { sentence_count++; }   // Increment count for '?'
+.   { /* Ignore other characters */ }
+\n  { /* Handle new lines */ }
+%%
+
+int main() {
+    printf("Enter text (Press Ctrl+D to stop):\n");
+    yylex();  // Start lexical analysis
+
+    printf("Number of sentences: %d\n", sentence_count);
+    return 0;
+}
+
+int yywrap() { return 1; }
+
+
+
+file_input:
+
+%{
+    #include <stdio.h>
+    int sentence_count = 0;
+    FILE *yyin;  // Ensure yyin is declared
+%}
+
+%%
+
+[.!?]       { sentence_count++; }   // Matches any '.', '!', or '?' character
+[ \t\n]+    { /* Ignore whitespace */ }
+.           { /* Ignore all other characters */ }
+
+%%
+
+int main() {
+    FILE *fp;
+    char filename[100];
+
+    printf("Enter filename: ");
+    scanf("%s", filename);
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Error opening file\n");
+        return 1;
+    }
+
+    yyin = fp;
+    yylex();
+
+    printf("Number of sentences: %d\n", sentence_count);
+    fclose(fp);
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

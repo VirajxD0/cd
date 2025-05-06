@@ -1,0 +1,53 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#define MAX 100
+
+typedef struct { char op, arg1[20], arg2[20], res[20]; } Quad;
+Quad quads[MAX]; int count = 0;
+
+int isNum(const char* s) { while (*s) if (!isdigit(*s++)) return 0; return 1; }
+int eval(int a, int b, char op) {
+    if (op == '+') return a + b;
+    if (op == '-') return a - b;
+    if (op == '*') return a * b;
+    if (op == '/' && b) return a / b;
+    return 0;
+}
+
+void fold() {
+    for (int i = 0; i < count; i++)
+        if (isNum(quads[i].arg1) && isNum(quads[i].arg2)) {
+            int r = eval(atoi(quads[i].arg1), atoi(quads[i].arg2), quads[i].op);
+            sprintf(quads[i].arg1, "%d", r);
+            quads[i].arg2[0] = '\0';  // make arg2 empty
+            quads[i].op = '=';
+        }
+}
+
+int main() {
+    int n;
+    printf("Enter number of quadruples: ");
+    scanf("%d", &n);
+    printf("Enter quadruples in format: (op, arg1, arg2, result)\n");
+    for (int i = 0; i < n; i++)
+        scanf(" ( %c , %[^,] , %[^,] , %[^)] )", &quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].res), count++;
+
+    fold();
+
+    printf("\n===== Optimized Quadruples (Constant Folding) =====\n");
+    for (int i = 0; i < count; i++)
+        if (quads[i].op == '=')
+            printf("(%c, %s, _, %s)\n", quads[i].op, quads[i].arg1, quads[i].res);
+        else
+            printf("(%c, %s, %s, %s)\n", quads[i].op, quads[i].arg1, quads[i].arg2, quads[i].res);
+}
+
+
+
+
+// (+, 2, 3, a)
+// (*, 4, 5, b)
+// (+, a, b, c)
+// (-, 10, 2, d)

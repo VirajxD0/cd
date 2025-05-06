@@ -1,0 +1,45 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int line_no = 1;
+%}
+
+%%
+"the"|"The"                 { printf("Line %d: Lexeme: %s Token: ARTICLE\n", line_no, yytext); }
+"boy"|"Boy"|"girl"|"Girl"    { printf("Line %d: Lexeme: %s Token: NOUN\n", line_no, yytext); }
+"is"|"are"|"was"|"were"      { printf("Line %d: Lexeme: %s Token: HELPING VERB\n", line_no, yytext); }
+"swimming"|"running"|"eating"|"walking" { printf("Line %d: Lexeme: %s Token: VERB\n", line_no, yytext); }
+
+[.,?!;:"'()\[\]]             { printf("Line %d: Lexeme: %s Token: PUNCTUATION\n", line_no, yytext); }
+
+[a-zA-Z]+                    { printf("Line %d: Lexeme: %s Token: UNKNOWN\n", line_no, yytext); }
+
+[\t ]+                       { /* Ignore spaces and tabs */ }
+
+\n                           { line_no++; }
+%%
+
+int main(int argc, char *argv[]) {
+    if (argc != 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *file = fopen(argv[1], "r");
+    if (!file) {
+        printf("Error opening file: %s\n", argv[1]);
+        return 1;
+    }
+
+    yyin = file;
+    yylex();
+    fclose(file);
+
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

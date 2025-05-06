@@ -1,0 +1,49 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int line_no = 1;
+%}
+
+%%
+
+"int"|"return"   { printf("Line %d: %s\tKEYWORD\n", line_no, yytext); }
+
+[0-9]+           { printf("Line %d: %s\tNUMBER\tValue: %s\n", line_no, yytext, yytext); }
+
+\"[^\"]*\"       { printf("Line %d: %s\tSTRING\tValue: %s\n", line_no, yytext, yytext); }
+
+[+\-*/=]         { printf("Line %d: %s\tOPERATOR\n", line_no, yytext); }
+
+[;,\(\){}]       { printf("Line %d: %s\tDELIMITER\n", line_no, yytext); }
+
+[0-9][a-zA-Z0-9_]*  { printf("Line %d: ERROR\tInvalid identifier: %s (Cannot start with a number)\n", line_no, yytext); }
+
+[a-zA-Z_][a-zA-Z0-9_]*  { printf("Line %d: %s\tIDENTIFIER\n", line_no, yytext); }
+
+[\t ]+           { /* Ignore */ }
+
+\n               { line_no++; }
+
+.                { printf("Line %d: ERROR\tUnknown character: %s\n", line_no, yytext); }
+%%
+
+int main()
+{
+    char code[10000];  // Large buffer for multi-line input
+    printf("Enter your code (Press Ctrl+D to end input):\n");
+
+    size_t len = fread(code, 1, sizeof(code) - 1, stdin);
+    code[len] = '\0';
+
+    yy_scan_string(code);
+    yylex();
+
+    return 0;
+}
+
+int yywrap()
+{
+    return 1;
+}

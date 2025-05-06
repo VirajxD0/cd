@@ -1,0 +1,126 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX 10000
+
+// Java keywords
+const char *java_keywords[] = {
+    "abstract","assert","boolean","break","byte","case","catch","char","class",
+    "const","continue","default","do","double","else","enum","extends","final",
+    "finally","float","for","goto","if","implements","import","instanceof","int",
+    "interface","long","native","new","package","private","protected","public",
+    "return","short","static","strictfp","super","switch","synchronized","this",
+    "throw","throws","transient","try","void","volatile","while"
+};
+
+int is_java_keyword(const char *word) {
+    for (int i = 0; i < sizeof(java_keywords)/sizeof(java_keywords[0]); i++)
+        if (strcmp(word, java_keywords[i]) == 0) return 1;
+    return 0;
+}
+
+// Common standard Java identifiers
+const char *java_std_funcs[] = {"System", "out", "in", "println", "print"};
+int is_java_std_func(const char *word) {
+    for (int i = 0; i < sizeof(java_std_funcs)/sizeof(java_std_funcs[0]); i++)
+        if (strcmp(word, java_std_funcs[i]) == 0) return 1;
+    return 0;
+}
+
+int is_delim(char ch) {
+    return strchr("(){}[],;.", ch) != NULL;
+}
+
+int is_op(char ch) {
+    return strchr("+-*/=%<>&|!^~", ch) != NULL;
+}
+
+void tokenize(const char *code) {
+    char word[100];
+    int i = 0, j;
+
+    while (code[i]) {
+        if (isspace(code[i])) { i++; continue; }
+
+        // Comments
+        if (code[i] == '/' && code[i+1] == '/') {
+            while (code[i] && code[i] != '\n') i++;
+            continue;
+        } else if (code[i] == '/' && code[i+1] == '*') {
+            i += 2;
+            while (code[i] && !(code[i] == '*' && code[i+1] == '/')) i++;
+            if (code[i]) i += 2;
+            continue;
+        }
+
+        // Identifiers / Keywords / Functions
+        if (isalpha(code[i]) || code[i] == '_') {
+            j = 0;
+            while (isalnum(code[i]) || code[i] == '_') word[j++] = code[i++];
+            word[j] = '\0';
+            if (is_java_keyword(word))
+                printf("%-20s : KEYWORD\n", word);
+            else if (is_java_std_func(word))
+                printf("%-20s : STD_LIB_FUNC\n", word);
+            else
+                printf("%-20s : IDENTIFIER\n", word);
+        }
+        // Numbers
+        else if (isdigit(code[i])) {
+            j = 0;
+            while (isdigit(code[i]) || code[i] == '.') word[j++] = code[i++];
+            word[j] = '\0';
+            printf("%-20s : NUMERIC_LITERAL\n", word);
+        }
+        // String literals
+        else if (code[i] == '"' || code[i] == '\'') {
+            char quote = code[i++];
+            j = 0; word[j++] = quote;
+            while (code[i] != quote && code[i]) word[j++] = code[i++];
+            if (code[i] == quote) word[j++] = code[i++];
+            word[j] = '\0';
+            printf("%-20s : STRING_LITERAL\n", word);
+        }
+        // Operators
+        else if (is_op(code[i])) {
+            j = 0;
+            while (is_op(code[i])) word[j++] = code[i++];
+            word[j] = '\0';
+            printf("%-20s : OPERATOR\n", word);
+        }
+        // Delimiters
+        else if (is_delim(code[i])) {
+            printf("%-20c : DELIMITER\n", code[i++]);
+        }
+        else {
+            printf("%-20c : UNKNOWN\n", code[i++]);
+        }
+    }
+}
+
+int main() {
+    char code[MAX], line[256];
+
+    printf("Enter Java code (Press Ctrl+Z or Ctrl+D to end input):\n");
+    code[0] = '\0';
+
+    while (fgets(line, sizeof(line), stdin)) {
+        strcat(code, line);
+    }
+
+    printf("\n--- Token Output ---\n");
+    tokenize(code);
+    return 0;
+}
+
+
+input:
+public class Hello {
+public class void main(String[] args) {
+int a = 10; 
+int b = 20;
+System.out.println("Sum is: " + (a + b));
+}
+}
+

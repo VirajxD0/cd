@@ -1,0 +1,50 @@
+%{
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+int option;
+%}
+
+%%
+[Oo]ne       { if(option == 1) printf("1 "); else printf("one "); }
+[Tt]wo       { if(option == 1) printf("2 "); else printf("two "); }
+[Tt]hree     { if(option == 1) printf("3 "); else printf("three "); }
+[Ff]our      { if(option == 1) printf("4 "); else printf("four "); }
+[Ff]ive      { if(option == 1) printf("5 "); else printf("five "); }
+[Ss]ix       { if(option == 1) printf("6 "); else printf("six "); }
+[Ss]even     { if(option == 1) printf("7 "); else printf("seven "); }
+[Ee]ight     { if(option == 1) printf("8 "); else printf("eight "); }
+[Nn]ine      { if(option == 1) printf("9 "); else printf("nine "); }
+[Zz]ero      { if(option == 1) printf("0 "); else printf("zero "); }
+0            { if(option == 2) printf("zero "); else printf("0 "); }
+1            { if(option == 2) printf("one "); else printf("1 "); }
+2            { if(option == 2) printf("two "); else printf("2 "); }
+3            { if(option == 2) printf("three "); else printf("3 "); }
+4            { if(option == 2) printf("four "); else printf("4 "); }
+5            { if(option == 2) printf("five "); else printf("5 "); }
+6            { if(option == 2) printf("six "); else printf("6 "); }
+7            { if(option == 2) printf("seven "); else printf("7 "); }
+8            { if(option == 2) printf("eight "); else printf("8 "); }
+9            { if(option == 2) printf("nine "); else printf("9 "); }
+.            { printf(". "); }
+[a-zA-Z]+    { printf("%s ", yytext); }
+[0-9]+       { printf("%s ", yytext); }
+[ \t\n]+     { printf("%s", yytext); }
+%%
+
+int main()
+{
+    printf("Choose an option:\n");
+    printf("1. Replace words with digits\n");
+    printf("2. Replace digits with words\n");
+    printf("Enter your choice: ");
+    scanf("%d", &option);
+    printf("Enter the text: \n");
+    yylex();
+    return 0;
+}
+
+int yywrap()
+{
+    return 1;
+}

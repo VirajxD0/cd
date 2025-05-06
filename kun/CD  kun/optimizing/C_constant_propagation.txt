@@ -1,0 +1,51 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+
+struct Quad {
+    char op[5], a1[10], a2[10], res[10];
+};
+
+int isConst(char *s) {
+    for (int i = 0; s[i]; i++)
+        if (s[i] < '0' || s[i] > '9') return 0;
+    return 1;
+}
+
+int main() {
+    struct Quad q[MAX];
+    char constMap[MAX][10], constVal[MAX][10];
+    int n, constCount = 0;
+
+    printf("Enter the number of quadruples: ");
+    scanf("%d", &n);
+
+    printf("Enter each quadruple in the format: op a1 a2 res\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%s %s %s %s", q[i].op, q[i].a1, q[i].a2, q[i].res);
+    }
+
+    // Perform constant propagation
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < constCount; j++) {
+            if (!strcmp(q[i].a1, constMap[j])) strcpy(q[i].a1, constVal[j]);
+            if (!strcmp(q[i].a2, constMap[j])) strcpy(q[i].a2, constVal[j]);
+        }
+        if (!strcmp(q[i].op, "=") && isConst(q[i].a1)) {
+            strcpy(constMap[constCount], q[i].res);
+            strcpy(constVal[constCount++], q[i].a1);
+        }
+    }
+    printf("\nAfter Constant Propagation:\n");
+    for (int i = 0; i < n; i++) {
+        printf("%s\t%s\t%s\t%s\n", q[i].op, q[i].a1, q[i].a2, q[i].res);
+    }
+    return 0;
+}
+
+
+// = 5 - a
+// + a 3 t1
+// * t1 2 t2
+// = 7 - b
+// - b 1 t3

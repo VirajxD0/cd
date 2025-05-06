@@ -1,0 +1,31 @@
+%{
+#include <stdio.h>
+#include <string.h>
+
+int valid = 0;  // Flag to check if at least one valid email was found
+%}
+
+%%
+
+^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ {
+    printf("Valid Email: %s\n", yytext);
+    valid = 1;
+}
+
+.* {
+    if (!valid) {
+        printf("Invalid Email: %s\n", yytext);
+    }
+}
+
+%%
+
+int main() {
+    printf("Enter an email address to check:\n");
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}

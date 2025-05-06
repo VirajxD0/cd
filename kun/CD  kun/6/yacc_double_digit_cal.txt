@@ -1,0 +1,94 @@
+A6_lexer.l
+
+%{
+#include "A6_parser.tab.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+extern int yylval;
+extern void yyerror(const char *s);
+%}
+
+%%
+[a-z]         { yylval = yytext[0] - 'a'; return VARIABLE; }
+[1-9][0-9]    { yylval = atoi(yytext); return NUMBER; }
+[0-9]         { yyerror("Error: Single-digit numbers are not allowed"); }
+[+\-*/=]      { return yytext[0]; }
+[\t ]         { /* Ignore whitespace */ }
+\n            { return '\n'; }
+.             { return yytext[0]; }
+%%
+
+int yywrap() { return 1; }
+
+
+
+
+A6_parser.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+void yyerror(const char *s);
+int yylex();
+
+int symbol_table[26] = {0};
+int final_result = 0;
+%}
+
+%token NUMBER VARIABLE
+%left '+' '-'
+%left '*' '/'
+%right '='
+
+%%
+input:
+    /* empty */
+    | input line
+    ;
+
+line:
+    '\n'
+    | exp '\n' { final_result = $1; }
+    ;
+
+exp:
+    NUMBER      { $$ = $1; }
+    | VARIABLE  { $$ = symbol_table[$1]; }
+    | VARIABLE '=' exp { symbol_table[$1] = $3; $$ = $3; }
+    | exp '+' exp  { $$ = $1 + $3; }
+    | exp '-' exp  { $$ = $1 - $3; }
+    | exp '*' exp  { $$ = $1 * $3; }
+    | exp '/' exp  {
+        if ($3 == 0) {
+            yyerror("Error: Division by zero");
+            $$ = 0;
+        } else {
+            $$ = $1 / $3;
+        }
+    }
+    ;
+
+%%
+
+void yyerror(const char *s) {
+    fprintf(stderr, "%s\n", s);
+}
+
+int main() {
+    printf("Enter expressions (Ctrl+D to exit):\n");
+    yyparse();
+    printf("Result: %d\n", final_result);
+    return 0;
+}
+
+
+
+flex filename.l
+bison -d filename.y
+gcc lex.yy.c filename.tab.c 
+./a.exe 
+
+
+& "C:\Progra~2\GnuWin32\bin\bison.exe" -d filename.y

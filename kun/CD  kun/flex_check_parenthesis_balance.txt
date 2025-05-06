@@ -1,0 +1,26 @@
+%{
+#include <stdio.h>
+
+int open_paren = 0;  // Counter for '('
+int close_paren = 0; // Counter for ')'
+%}
+
+%%
+"(" { open_paren++; }   // Increase count for '('
+")" { close_paren++; }  // Increase count for ')'
+.   { /* Ignore other characters */ }
+%%
+
+int main() {
+    printf("Enter the expression: ");
+    yylex();  // Start lexical analysis
+
+    if (open_paren == close_paren)
+        printf("Parentheses are balanced.\n");
+    else
+        printf("Parentheses are not balanced.\n");
+
+    return 0;
+}
+
+int yywrap() { return 1; }
