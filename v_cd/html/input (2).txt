@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<head>
+    <title>HTML Lexer Test</title>
+    <style type="text/css">
+        body {
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+        }
+        h1 {
+            color: #0066cc;
+        }
+    </style>
+    <script>
+        function showMessage() {
+            alert("Hello, world!");
+            document.getElementById("demo").innerHTML = "Button clicked!";
+        }
+    </script>
+</head>
+<body>
+    <!-- This is a comment for testing -->
+    <div class="container">
+        <h1>HTML Lexer Test Document</h1>
+        <p>This is a sample HTML document to test our lexical analyzer.</p>
+
+        <img src="image.jpg" alt="Sample image" />
+
+        <ul>
+            <li>Item 1</li>
+            <li>Item 2</li>
+            <li>Item 3</li>
+        </ul>
+
+        <p id="demo">Click the button to change this text.</p>
+        <button onclick="showMessage()">Click Me</button>
+
+        <section>
+            <h2>CDATA Example</h2>
+            <![CDATA[
+            This is CDATA content that won't be parsed as HTML. <tags> won't be interpreted inside CDATA sections.
+            ]]>
+        </section>
+    </div>
+</body>
+</html>
