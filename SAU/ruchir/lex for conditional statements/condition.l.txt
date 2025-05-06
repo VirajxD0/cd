@@ -1,0 +1,75 @@
+%{
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+
+typedef struct {
+  char type[20];
+  char lexeme[200];
+} Token;
+
+Token tokens[MAX];
+int token_count = 0;
+int if_count = 0, else_count = 0, else_if_count = 0, switch_count = 0, case_count = 0;
+
+void add_tokens(const char* type, const char* lexeme) {
+    if (token_count < MAX) {
+        strcpy(tokens[token_count].type, type);
+        strcpy(tokens[token_count].lexeme, lexeme);
+        token_count++;
+    }
+}
+%}
+
+%option noyywrap
+
+IF        "if"[ \t]*"("[^)]*")"
+ELSEIF    "else"[ \t]*"if"[ \t]*"("[^)]*")"
+ELSE      "else"
+SWITCH    "switch"[ \t]*"("[^)]*")"
+CASE      "case"[ \t]+[a-zA-Z0-9_]+[ \t]*: 
+
+%%
+
+{ELSEIF}    { add_tokens("else if", yytext); else_if_count++; }
+{IF}        { add_tokens("if", yytext); if_count++; }
+{ELSE}      { add_tokens("else", yytext); else_count++; }
+{SWITCH}    { add_tokens("switch", yytext); switch_count++; }
+{CASE}      { add_tokens("case", yytext); case_count++; }
+[ \t\n]     ;
+. ;
+
+%%
+
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: %s <filename>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *fp = fopen(argv[1], "r");
+    if (!fp) {
+        perror("File open error");
+        return 1;
+    }
+
+    yyin = fp;
+    yylex();
+    fclose(fp);
+
+    printf("\n--- Conditional Statements Found ---\n");
+    printf("%-15s | %-30s\n", "Type", "Lexeme");
+    printf("---------------+--------------------------------\n");
+    for (int i = 0; i < token_count; ++i) {
+        printf("%-15s | %-30s\n", tokens[i].type, tokens[i].lexeme);
+    }
+
+    printf("\n--- Summary ---\n");
+    printf("if       : %d\n", if_count);
+    printf("else if  : %d\n", else_if_count);
+    printf("else     : %d\n", else_count);
+    printf("switch   : %d\n", switch_count);
+    printf("case     : %d\n", case_count);
+
+    return 0;
+}

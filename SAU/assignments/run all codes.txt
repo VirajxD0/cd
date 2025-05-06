@@ -1,0 +1,58 @@
+a1:
+
+a1.exe < in.sql
+
+a2: 
+
+lexer < input.c
+
+a3:
+
+.\calc
+
+a4:
+
+lexer < input.c
+
+a5:
+
+.\parser
+
+a6:
+
+while_parser < test.c
+
+
+
+a7:
+
+ese.exe
+
+a8:
+
+8.exe
+Enter number of quadruples: 4
+Enter quadruples (op, arg1, arg2, result):
+=, 5, , a
+=, 3, , b
++, a, b, c
+*, c, 2, d
+
+for lex
+2 ass
+lex a2.l
+gcc lex.yy.c -o lexer -lfl
+./lexer < input.c
+
+for yacc
+3 ass
+bison -d calc.y          
+flex calc.l               
+gcc -o calc calc.tab.c lex.yy.c -lfl
+./calc
+
+
+
+
+
+

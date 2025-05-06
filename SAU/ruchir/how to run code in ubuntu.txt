@@ -1,0 +1,31 @@
+On Ubuntu:
+
+flex c_lexer.l
+gcc lex.yy.c -o c_lexer
+./c_lexer
+
+# Install required tools
+sudo apt update
+sudo apt install flex bison gcc build-essential
+
+# Generate files using Bison and Flex
+bison -d english.y       # generates y.tab.c and y.tab.h
+flex english.l           # generates lex.yy.c
+
+# Compile the generated files
+gcc lex.yy.c y.tab.c -o eng_parser
+
+# Run the parser
+./eng_parser
+
+
+On Windows (with win_flex and gcc):
+
+win_flex c_lexer.l
+gcc lex.yy.c -o c_lexer
+c_lexer
+
+win_bison -d english.y       # This should generate y.tab.c and y.tab.h
+win_flex english.l           # This should generate lex.yy.c
+gcc lex.yy.c y.tab.c -o eng_parser.exe  # Compile the generated files
+eng_parser                   # Run the parser
