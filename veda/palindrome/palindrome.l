@@ -1,0 +1,38 @@
+%{
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+
+int is_palindrome(const char* str) {
+    int len = strlen(str);
+    for (int i = 0; i < len / 2; ++i) {
+        if (str[i] != str[len - i - 1]) {
+            return 0; // Not a palindrome
+        }
+    }
+    return 1; // Is a palindrome
+}
+%}
+
+%%
+[a-zA-Z]+ {
+    if (is_palindrome(yytext)) {
+        printf("\"%s\" is a palindrome\n", yytext);
+    } else {
+        printf("\"%s\" is not a palindrome\n", yytext);
+    }
+}
+[ \t\n]+ ;  // Ignore whitespace
+. ;         // Ignore any other characters
+%%
+
+int main() {
+    printf("Enter strings (CTRL+D to stop):\n");
+    yylex();
+    return 0;
+}
+
+int yywrap() {
+    return 1;
+}
+
